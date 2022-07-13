@@ -20,7 +20,7 @@ typedef struct {
 } dados;
 
 
-dados *alcoa_pessoas(int n) {
+dados *aloca_pessoas(int n) {
     dados *pessoas;
 
     pessoas = calloc(n, sizeof(dados));
@@ -33,8 +33,39 @@ dados *alcoa_pessoas(int n) {
 }
 
 
+dados *le_pessoas_arquivo(FILE *arq_dados, int *total) {
+    dados *pessoas;
+
+    // Conta o total de pessoas:
+    pessoas = aloca_pessoas(1);
+    if(pessoas == NULL) {
+        exit(1);
+    }
+
+    while(feof(arq_dados) == 0) {
+        fread(pessoas, sizeof(dados), 1, arq_dados);
+        *total++;
+    }
+
+    free(pessoas);
+
+    // Volta o cursor para o inicio do arquivo:
+    fseek(arq_dados, 0, SEEK_SET);
+
+    // Aloca pessoas novamente, mas agora com o valor correto de "total":
+    pessoas = aloca_pessoas(total);
+    if(pessoas == NULL) {
+        exit(1);
+    }
+
+    // Le, de fato, o arquivo e guarda os dados em "pessoas":
+    fread(pessoas, sizeof(dados), total, arq_dados);
+}
+
+
 int main (){
     int opt;
+    int total = 0;
     char nome_arquivo[50];
     FILE *arq_dados;
     dados *pessoas;
@@ -57,7 +88,8 @@ int main (){
 
             case 1:
                 //Recendo nome de arquivo e lendo arquivo
-                fgets(nome_arquivo, 50, stdin);
+                // fgets(nome_arquivo, 50, stdin);
+                scanf("%s", nome_arquivo);
 
                 arq_dados = fopen(nome_arquivo, "ab+");
 
@@ -66,11 +98,9 @@ int main (){
                     exit(1);
                 }
 
-                // Aloca uma posicao para o vetor de structs "pessoas":
-                pessoas = aloca_pessoas(1);
+                pessoas = le_pessoas_arquivo(arq_dados, &total);
 
-                // Falta terminar a leitura do arquivo:
-                // while(fread(pessoas, sizeof(dados), , arq_dados))
+                printf("Total de pessoas: %d \n", total);
 
                 break;
             case 2:
