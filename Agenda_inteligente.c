@@ -2,23 +2,29 @@
 #include <string.h>
 #include <stdlib.h>
 
+//Struct para data de nascimento
+typedef struct {
+    int dia;
+    int mes;
+    int ano;
+} data;
+
 // Struct Para musica
 typedef struct {
-    float sertanejo;
-    float rock;
-    float funk;
-} musica;
+    float playstation;
+    float xbox;
+    float pc;
+} preferencia;
 
 // Struct para Informações gerais
 typedef struct {
     char nome_completo[100];
-    char nascimento[100];
+    data nascimento;
     char cidade[100];
     char uf[2];
-    musica esta_musica;
+    preferencia videogames;
     int grupo_registro;
 } dados;
-
 
 dados *aloca_pessoas(int n) {
     dados *pessoas;
@@ -31,7 +37,6 @@ dados *aloca_pessoas(int n) {
 
     return pessoas;
 }
-
 
 dados *le_pessoas_arquivo(FILE *arq_dados, int *total) {
     dados *pessoas;
@@ -62,6 +67,30 @@ dados *le_pessoas_arquivo(FILE *arq_dados, int *total) {
     fread(pessoas, sizeof(dados), total, arq_dados);
 }
 
+void cadastra_registro(dados *pessoas, int total) {
+    printf("Insira os dados do novo registro: \n");
+
+    printf("Nome completo: ");
+    scanf(" %[^\n]%*c", pessoas[total-1].nome_completo);
+    printf("Data de nascimento:\n");
+    printf("\tDia: ");
+    scanf("%d", &pessoas[total-1].nascimento.dia);
+    printf("\tMes: ");
+    scanf("%d", &pessoas[total-1].nascimento.mes);
+    printf("\tAno: ");
+    scanf("%d", &pessoas[total-1].nascimento.ano);
+    printf("Cidade: ");
+    scanf(" %[^\n]%*c", pessoas[total-1].cidade);
+    printf("UF: ");
+    scanf("%s", pessoas[total-1].uf);
+    printf("Preferencias:\n");
+    printf("\tPlaystation (De 0 a 1): ");
+    scanf("%f", &pessoas[total-1].videogames.playstation);
+    printf("\tXbox (De 0 a 1): ");
+    scanf("%f", &pessoas[total-1].videogames.xbox);
+    printf("\tPC (De 0 a 1): ");
+    scanf("%f", &pessoas[total-1].videogames.pc);
+}
 
 int main (){
     int opt;
@@ -87,6 +116,8 @@ int main (){
         switch (opt) {
 
             case 1:
+                printf("IMPORTACAO DE REGISTROS \n\n");
+                printf("Digite o nome do arquivo do qual deseja importar os registros: \n");
                 //Recendo nome de arquivo e lendo arquivo
                 // fgets(nome_arquivo, 50, stdin);
                 scanf("%s", nome_arquivo);
@@ -101,10 +132,34 @@ int main (){
                 pessoas = le_pessoas_arquivo(arq_dados, &total);
 
                 printf("Total de pessoas: %d \n", total);
+                printf("Registros importados com sucesso. \n");
 
                 break;
             case 2:
-                printf("b");
+                printf("CADASTRO DE REGISTRO \n\n");
+                total++;
+                
+                // Alocacao de "pessoas":
+                if(total == 1) {
+                    // Se eh o primeiro registro a ser feito, aloca-se 1 posicao:
+                    pessoas = aloca_pessoas(total);
+                    if(pessoas == NULL) {
+                        exit(1);
+                    }
+                }
+                else {
+                    // Se nao eh o primeiro registro, entao realoca uma posicao a mais:
+                    pessoas = realloc(pessoas, total * sizeof(dados));
+                    if(pessoas == NULL) {
+                        printf("Erro ao realocar pessoas. \n");
+                        exit(1);
+                    }
+                }
+
+                cadastra_registro(pessoas, total);
+
+                printf("Cadastro realizado com sucesso. \n");
+
                 break;
             case 3:
                 printf("c");
