@@ -40,6 +40,7 @@ dados *aloca_pessoas(int n) {
 
 dados *le_pessoas_arquivo(FILE *arq_dados, int *total) {
     dados *pessoas;
+    int total_pessoas = 0;
 
     // Conta o total de pessoas:
     pessoas = aloca_pessoas(1);
@@ -47,10 +48,11 @@ dados *le_pessoas_arquivo(FILE *arq_dados, int *total) {
         exit(1);
     }
 
-    while(feof(arq_dados) == 0) {
-        fread(pessoas, sizeof(dados), 1, arq_dados);
-        *total++;
+    while(fread(pessoas, sizeof(dados), 1, arq_dados)) {
+        total_pessoas++;
     }
+
+    *total = total_pessoas;
 
     free(pessoas);
 
@@ -58,13 +60,15 @@ dados *le_pessoas_arquivo(FILE *arq_dados, int *total) {
     fseek(arq_dados, 0, SEEK_SET);
 
     // Aloca pessoas novamente, mas agora com o valor correto de "total":
-    pessoas = aloca_pessoas(total);
+    pessoas = aloca_pessoas(total_pessoas);
     if(pessoas == NULL) {
         exit(1);
     }
 
     // Le, de fato, o arquivo e guarda os dados em "pessoas":
-    fread(pessoas, sizeof(dados), total, arq_dados);
+    fread(pessoas, sizeof(dados), total_pessoas, arq_dados);
+
+    return pessoas;    
 }
 
 void cadastra_registro(dados *pessoas, int total) {
@@ -92,10 +96,28 @@ void cadastra_registro(dados *pessoas, int total) {
     scanf("%f", &pessoas[total-1].videogames.pc);
 }
 
-void exporta_registros(FILE *arq_dados, dados *pessoas, int total) {
-    
+dados *exclui_registro(dados *pessoas, int total) {
+    dados *novo_pessoas;
+    char nome[100];
+    int j = 0;
 
+    novo_pessoas = aloca_pessoas(total-1);
+    if(novo_pessoas == NULL) {
+        printf("Erro ao alocar novo_pessoas. \n");
+        return NULL;
+    }
 
+    printf("Digite o nome da pessoas que deseja excluir: ");
+    scanf(" %[^\n]%*c", nome);
+
+    for(int i = 0; i < total; i++) {
+        if(strcmp(pessoas[i].nome_completo, nome) != 0) {
+            novo_pessoas[j] = pessoas[i];
+            j++;
+        }
+    }
+
+    return novo_pessoas;
 }
 
 int main (){
@@ -139,6 +161,13 @@ int main (){
                 fclose(arq_dados);
 
                 printf("Total de pessoas: %d \n", total);
+                
+                for(int i = 0; i < total; i++) {
+                    printf("%s\n", pessoas[i].nome_completo);
+                    printf("%s\n", pessoas[i].cidade);
+                    printf("%s\n", pessoas[i].uf);
+                }
+                
                 printf("Registros importados com sucesso. \n");
 
                 break;
@@ -172,7 +201,14 @@ int main (){
                 printf("c");
                 break;
             case 4:
-                printf("d");
+                printf("EXCLUSAO DE REGISTRO. \n");
+
+                pessoas = exclui_registro(pessoas, total);
+
+                total--;
+
+                printf("Cadastro excluido com sucesso. \n");
+
                 break;
             case 5:
                 printf("e");
