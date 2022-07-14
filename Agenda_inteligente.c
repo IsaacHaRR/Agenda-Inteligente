@@ -92,6 +92,12 @@ void cadastra_registro(dados *pessoas, int total) {
     scanf("%f", &pessoas[total-1].videogames.pc);
 }
 
+void exporta_registros(FILE *arq_dados, dados *pessoas, int total) {
+    
+
+
+}
+
 int main (){
     int opt;
     int total = 0;
@@ -122,14 +128,15 @@ int main (){
                 // fgets(nome_arquivo, 50, stdin);
                 scanf("%s", nome_arquivo);
 
-                arq_dados = fopen(nome_arquivo, "ab+");
-
+                arq_dados = fopen(nome_arquivo, "rb");
                 if(arq_dados == NULL) {
                     printf("Erro abrindo arquivo");
                     exit(1);
                 }
 
                 pessoas = le_pessoas_arquivo(arq_dados, &total);
+
+                fclose(arq_dados);
 
                 printf("Total de pessoas: %d \n", total);
                 printf("Registros importados com sucesso. \n");
@@ -177,9 +184,29 @@ int main (){
                 printf("g");
                 break;
             case 8:
-                printf("h");
+                printf("EXPORTACAO DE REGISTROS \n\n");
+                printf("Digite o nome do arquivo para o qual deseja exportar os registros: \n");
+                
+                // Recendo nome de arquivo:
+                scanf("%s", nome_arquivo);
+
+                // Abre arquivo para escrita:
+                arq_dados = fopen(nome_arquivo, "wb");
+                if(arq_dados == NULL) {
+                    printf("Erro ao abrir arquivo para exportacao. \n");
+                    exit(1);
+                }
+
+                // Escreve os registros no arquivo:
+                fwrite(pessoas, sizeof(dados), total, arq_dados);
+            
+                printf("Exportacao de registros realizada com sucesso. \n");
+
+                fclose(arq_dados);
+
                 break;
             case 0:
+                free(pessoas);
                 printf("Fechando a agenda. Ate mais!\n");
                 break;
             default:
