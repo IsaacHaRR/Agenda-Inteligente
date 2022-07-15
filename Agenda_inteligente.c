@@ -120,6 +120,82 @@ dados *exclui_registro(dados *pessoas, int total) {
     return novo_pessoas;
 }
 
+int edita_registro(dados *pessoas, char nome[], int total) {
+    int campo = 0;
+    int indice;
+    int i = 0;
+    int encontrado = 0;
+
+    // Realiza a busca pelo indice do registro referente ao nome passado:
+    while((encontrado == 0) && (i < total)) {
+        if(strcmp(nome, pessoas[i].nome_completo) == 0) {
+            indice = i;
+            printf("Indice encontrado! (%d) \n", indice);
+            encontrado = 1;
+        }
+        i++;
+    }
+
+    if(encontrado == 0) {
+        printf("ATENCAO! Nome nao encontrado! \n");
+    }
+    else {
+        // Menu de campos a serem editados:
+        do {
+            printf("[1] - Nome\n");
+            printf("[2] - Data de nascimento\n");
+            printf("[3] - Cidade\n");
+            printf("[4] - UF\n");
+            printf("[5] - Preferencias\n");
+            printf("[0] - Parar de editar\n\n");
+            printf("Escolha qual campo deseja alterar, ou digite 0 para parar de editar: ");
+            scanf("%d", &campo);
+            printf("\n");
+
+            switch(campo) {
+                case 1:
+                    printf("Insira o novo nome: ");
+                    scanf(" %[^\n]%*c", pessoas[indice].nome_completo);
+                    break;
+                case 2:
+                    printf("Insira a nova data de nascimento:\n");
+                    printf("\tDia: ");
+                    scanf("%d", &pessoas[indice].nascimento.dia);
+                    printf("\tMes: ");
+                    scanf("%d", &pessoas[indice].nascimento.mes);
+                    printf("\tAno: ");
+                    scanf("%d", &pessoas[indice].nascimento.ano);
+                    break;
+                case 3:
+                    printf("Insira o nova Cidade: ");
+                    scanf(" %[^\n]%*c", pessoas[indice].cidade);
+                    break;
+                case 4:
+                    printf("Insira a nova UF: ");
+                    scanf("%s", pessoas[indice].uf);
+                    break;
+                case 5:
+                    printf("Insira as novas preferencias de %s: \n", pessoas[indice].nome_completo);
+                    printf("\tPlaystation: ");
+                    scanf("%f", &pessoas[indice].videogames.playstation);
+                    printf("\tXbox: ");
+                    scanf("%f", &pessoas[indice].videogames.xbox);
+                    printf("\tPC: ");
+                    scanf("%f", pessoas[indice].videogames.pc);
+                    break;
+                case 0:
+                    printf("Parando de editar os campos de %s. \n", pessoas[indice].nome_completo);
+                    break;
+                default:
+                    printf("Campo invalido, por favor digite uma das opcoes do menu: \n");
+                    break;
+            }
+        } while(campo != 0);
+    }
+
+    return encontrado;
+}
+
 int main (){
     int opt;
     int total = 0;
@@ -198,7 +274,24 @@ int main (){
 
                 break;
             case 3:
-                printf("c");
+                printf("EDICAO DE REGISTRO. \n");
+
+                char nome[100];
+                int sucesso;
+
+                // Recebe o nome completo do registro que deseja editar:
+                printf("Digite o nome completo do registro que deseja editar: ");
+                scanf(" %[^\n]%*c", nome);
+
+                sucesso = edita_registro(pessoas, nome, total);
+
+                if(sucesso) {
+                    printf("Edicao realizada com sucesso. \n");
+                }
+                else {
+                    printf("Falha na edicao. \n");
+                }
+
                 break;
             case 4:
                 printf("EXCLUSAO DE REGISTRO. \n");
