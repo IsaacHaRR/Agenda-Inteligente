@@ -23,7 +23,7 @@ typedef struct {
     char cidade[100];
     char uf[2];
     preferencia videogames;
-    int grupo_registro;
+    int grupo;
 } dados;
 
 dados *aloca_pessoas(int n) {
@@ -196,6 +196,42 @@ int edita_registro(dados *pessoas, char nome[], int total) {
     return encontrado;
 }
 
+void agrupa_registros(dados *pessoas, int total) {
+    float euclidiana;
+    float x_ps, y_xbox, z_pc;
+    int g = 1;
+
+    // Atribui o grupo do primeiro registro como grupo 1:
+    pessoas[0].grupo = g;
+    
+    // Passa por toda a agenda, calculando o grupo de cada registro:
+    for(int i = 1; i < total; i++) {
+        int agrupado = 0;
+
+        // Para cada registro (pessoas[i]), calcula-se a distancia euclidiana para cada registro anterior pessoas[j]:
+        for(int j = 0; j < i; j++) {
+            x_ps = pessoas[i].videogames.playstation - pessoas[j].videogames.playstation;
+            y_xbox = pessoas[i].videogames.xbox - pessoas[j].videogames.xbox;
+            z_pc = pessoas[i].videogames.pc - pessoas[j].videogames.pc;
+
+            euclidiana = sqrt(pow(x_ps, 2) + pow(y_xbox, 2) + pow(z_pc, 2));
+
+            // Se distancia euclidiana < 0.5, entao pertence ao mesmo grupo:
+            if(euclidiana < 0.5) {
+                pessoas[i].grupo = pessoas[j].grupo;
+                agrupado = 1;
+                break;
+            }
+        }
+
+        // Se nao pertence a nenhum grupo existente, cria um grupo novo:
+        if(agrupado == 0) {
+            g++;
+            pessoas[i].grupo = g;
+        }
+    }
+}
+
 int main (){
     int opt;
     int total = 0;
@@ -239,9 +275,10 @@ int main (){
                 printf("Total de pessoas: %d \n", total);
                 
                 for(int i = 0; i < total; i++) {
-                    printf("%s\n", pessoas[i].nome_completo);
-                    printf("%s\n", pessoas[i].cidade);
-                    printf("%s\n", pessoas[i].uf);
+                    printf("\nnome: %s\n", pessoas[i].nome_completo);
+                    printf("cidade: %s\n", pessoas[i].cidade);
+                    printf("UF: %s\n", pessoas[i].uf);
+                    printf("grupo: %d\n", pessoas[i].grupo);
                 }
                 
                 printf("Registros importados com sucesso. \n");
@@ -304,13 +341,25 @@ int main (){
 
                 break;
             case 5:
-                printf("e");
+                printf("BUSCA DE REGISTRO. \n");
+
+                printf("Escolha por qual informacao deseja buscar o registro:\n");
+                printf("[1] - Por nome ou parte do nome\n");
+                printf("[2] - Por data de nascimento\n");
+                printf("[3] - Pelo grupo\n");
+                // ...
+
                 break;
             case 6:
                 printf("f");
                 break;
             case 7:
-                printf("g");
+                printf("AGRUPAMENTO DE REGISTROS. \n");
+
+                agrupa_registros(pessoas, total);
+
+                printf("Registros agrupados com sucesso. \n");
+
                 break;
             case 8:
                 printf("EXPORTACAO DE REGISTROS \n\n");
