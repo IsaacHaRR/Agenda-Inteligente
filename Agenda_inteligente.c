@@ -248,68 +248,55 @@ void imprime_info(dados *pessoas, int i) {
 }
 
 void busca_por_nome(dados *pessoas, int total) {
-    // char nome[100];
-    // int i = 0;
-    // int encontrado = 0;
+    char nome[100];
+    int i = 0;
+    int encontrado = 0;
 
-    // printf("Digite o nome completo ou parte dele para buscar o registro: ");
-    // scanf(" %[^\n]%*c", nome);
+    // Recebe o nome/parte do nome para realizar a busca:
+    printf("Digite o nome completo ou parte dele para buscar o registro: ");
+    scanf(" %[^\n]%*c", nome);
 
-    // do {
-    //     if(strcmp(nome, pessoas[i].nome_completo) == 0) {
-    //         printf("Registro encontrado por nome completo, indice = %d \n", i);
-    //         encontrado = 1;
-    //         break;
-    //     }
-    //     else {
-    //         int j = 0;
+    // Procura por toda a agenda:
+    do {
+        // Se encontrou pelo nome completo, imprime as informacoes e para o laco:
+        if(strcmp(nome, pessoas[i].nome_completo) == 0) {
+            printf("Registro encontrado por nome completo, indice = %d \n", i);
+            imprime_info(pessoas, i);
+            encontrado = 1;
+            break;
+        }
+        else {
+            // Procura e imprime as informacoes de todos que se encaixam com parte do nome lido:
+            int j = 0;
 
-    //         while(j < strlen(pessoas[i].nome_completo)) {
-    //             int m = 0;
-    //             while(pessoas[i].nome_completo[j] != ' ' && pessoas[i].nome_completo[j] != '\n') {
-    //                 if(nome[m] != pessoas[i].nome_completo[j]) {
-    //                     encontrado = 1;
-    //                 }
-    //             }
-    //         }
-    //     }
-          
-    //     // if(strcmp(nome, pessoas[i].nome_completo) == 0) {
-    //     //     printf("Registro encontrado por nome completo, indice = %d \n", i);
-    //     //     encontrado = 1;
-    //     // }
-    //     // else  {
-    //         // int j = 0;
-    //         // printf("Tamanho str de %s = %d \n", pessoas[i].nome_completo, strlen(pessoas[i].nome_completo));
-
-    //         // while(j < strlen(pessoas[i].nome_completo)) {
-    //         //     int parte_nome = 1;
-    //         //     int m = 0;
-    //         //     while(pessoas[i].nome_completo[j] != ' ' && pessoas[i].nome_completo[j] != '\n') {
-    //         //         if(nome[m] != pessoas[i].nome_completo[j]) {
-    //         //             parte_nome = 0;
-    //         //             break;
-    //         //         }
-    //         //         printf("j = %d | ", j);
-    //         //         j++;
-    //         //         m++;
-    //         //     }
-    //         //     if(parte_nome == 1) {
-    //         //         printf("Registro encontrado, indice = %d \n", i);
-    //         //         encontrado = 1;
-    //         //         break;
-    //         //     }
-    //         //     j++;
-    //         // }
+            while(j < strlen(pessoas[i].nome_completo)) {
+                int m = 0;
+                int parcial = 1;
+                // Verifica se ha uma letra diferente na palavra (separamos o nome completo em palavras):
+                while(pessoas[i].nome_completo[j] != ' ' && pessoas[i].nome_completo[j] != '\n' && pessoas[i].nome_completo[j] != '\0') {
+                    if(nome[m] != pessoas[i].nome_completo[j]) {
+                        parcial = 0;
+                    }
+                    j++;
+                    m++;
+                }
                 
-    //     // }
+                j++;
+                // Se nao ha nenhuma letra diferente na palavra, a parte do nome se encaixa, logo achamos um registro:
+                if(parcial == 1) {
+                    printf("Registro encontrado por parte do nome, indice = %d \n", i);
+                    imprime_info(pessoas, i);
+                    encontrado = 1;
+                }
+            }
+        }
 
-    //     i++;
-    // } while((encontrado == 0) && (i < total));
+        i++;
+    } while(i < total);
 
-    // if(encontrado == 0) {
-    //     printf("Registro nao encontrado. \n");
-    // }
+    if(encontrado == 0) {
+        printf("Nenhum registro encontrado com esse nome. \n");
+    }
 }
 
 void busca_por_nascimento(dados *pessoas, int total) {
@@ -339,7 +326,7 @@ void busca_por_nascimento(dados *pessoas, int total) {
             }
         }
         i++;
-    } while((encontrado == 0) && (i < total));
+    } while(i < total);
 
     if(encontrado == 0) {
         printf("Registro nao encontrado. \n");
@@ -379,7 +366,7 @@ int main (){
 
     do{
         // Menu
-        printf("\t\tMenu\n");
+        printf("\t\t-----------------Menu----------------\n");
         printf("[1] Importar registros de um arquivo\n");
         printf("[2] Cadastrar novo registro\n");
         printf("[3] Editar registro\n");
@@ -481,6 +468,7 @@ int main (){
                 int busca;
 
                 do {
+                    printf("--------------------------------------------------------\n");
                     printf("[1] - Por nome ou parte do nome\n");
                     printf("[2] - Por data de nascimento\n");
                     printf("[3] - Pelo grupo\n");
@@ -490,7 +478,7 @@ int main (){
 
                     switch(busca) {
                         case 1:
-                            // busca_por_nome(pessoas, total);
+                            busca_por_nome(pessoas, total);
                             break;
                         case 2:
                             busca_por_nascimento(pessoas, total);
