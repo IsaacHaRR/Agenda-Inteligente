@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 
 //Struct para data de nascimento
 typedef struct {
@@ -232,6 +233,131 @@ void agrupa_registros(dados *pessoas, int total) {
     }
 }
 
+void imprime_info(dados *pessoas, int i) {
+    printf("Nome: %s\n", pessoas[i].nome_completo);
+    printf("Data de nascimento:\n");
+    printf("\tDia: %.2d\n", pessoas[i].nascimento.dia);
+    printf("\tMes: %.2d\n", pessoas[i].nascimento.mes);
+    printf("\tAno: %d\n", pessoas[i].nascimento.ano);
+    printf("Cidade: %s\n", pessoas[i].cidade);
+    printf("UF: %s\n", pessoas[i].uf);
+    printf("Preferencias:\n");
+    printf("\tPlaystation: %f\n", pessoas[i].videogames.playstation);
+    printf("\tXbox: %f\n", pessoas[i].videogames.xbox);
+    printf("\tPC: %f\n", pessoas[i].videogames.pc);
+    printf("Grupo: %d\n\n", pessoas[i].grupo);
+}
+
+void busca_por_nome(dados *pessoas, int total) {
+    char nome[100];
+    int i = 0;
+    int encontrado = 0;
+
+    // Recebe o nome/parte do nome para realizar a busca:
+    printf("Digite o nome completo ou parte dele para buscar o registro: ");
+    scanf(" %[^\n]%*c", nome);
+
+    // Procura por toda a agenda:
+    do {
+        // Se encontrou pelo nome completo, imprime as informacoes e para o laco:
+        if(strcmp(nome, pessoas[i].nome_completo) == 0) {
+            printf("Registro encontrado por nome completo, indice = %d \n", i);
+            imprime_info(pessoas, i);
+            encontrado = 1;
+            break;
+        }
+        else {
+            // Procura e imprime as informacoes de todos que se encaixam com parte do nome lido:
+            int j = 0;
+
+            while(j < strlen(pessoas[i].nome_completo)) {
+                int m = 0;
+                int parcial = 1;
+                // Verifica se ha uma letra diferente na palavra (separamos o nome completo em palavras):
+                while(pessoas[i].nome_completo[j] != ' ' && pessoas[i].nome_completo[j] != '\n' && pessoas[i].nome_completo[j] != '\0') {
+                    if(nome[m] != pessoas[i].nome_completo[j]) {
+                        parcial = 0;
+                    }
+                    j++;
+                    m++;
+                }
+                
+                j++;
+                // Se nao ha nenhuma letra diferente na palavra, a parte do nome se encaixa, logo achamos um registro:
+                if(parcial == 1) {
+                    printf("Registro encontrado por parte do nome, indice = %d \n", i);
+                    imprime_info(pessoas, i);
+                    encontrado = 1;
+                }
+            }
+        }
+
+        i++;
+    } while(i < total);
+
+    if(encontrado == 0) {
+        printf("Nenhum registro encontrado com esse nome. \n");
+    }
+}
+
+void busca_por_nascimento(dados *pessoas, int total) {
+    int d, m ,a;
+    int i = 0;
+    int encontrado = 0;
+
+    // Recebe a data de nascimento para realizar a busca:
+    printf("Insira a data pela qual deseja buscar o registro:\n");
+    printf("Dia: ");
+    scanf("%d", &d);
+    printf("Mes: ");
+    scanf("%d", &m);
+    printf("Ano: ");
+    scanf("%d", &a);
+
+    // Busca linearmente o registro com a data de nascimento em questao:
+    do {
+        if(d == pessoas[i].nascimento.dia) {
+            if(m == pessoas[i].nascimento.mes) {
+                if(a == pessoas[i].nascimento.ano) {
+                    encontrado = 1;
+                    printf("\nRegistro encontrado! \n\n");
+                    // Imprime as informacoes do registro encontrado:
+                    imprime_info(pessoas, i);
+                }
+            }
+        }
+        i++;
+    } while(i < total);
+
+    if(encontrado == 0) {
+        printf("Registro nao encontrado. \n");
+    }
+}
+
+void busca_por_grupo(dados *pessoas, int total) {
+    int g;
+    int i = 0;
+    int encontrado = 0;
+
+    // Recebe o grupo para buscar registro(s):
+    printf("Insira o grupo pelo qual deseja buscar o(s) registro(s): ");
+    scanf("%d", &g);
+
+    // Busca linearmente todos os registros pertencentes ao grupo:
+    do {
+        if(g == pessoas[i].grupo) {
+            // Imprime informacoes de cada registro encontrado:
+            imprime_info(pessoas, i);
+            encontrado = 1;
+        }
+        i++;
+    } while(i < total);
+
+    if(encontrado == 0) {
+        printf("Nao ha nenhum registro pertencente a esse grupo. \n");
+    }
+}
+
 int main (){
     int opt;
     int total = 0;
@@ -241,7 +367,7 @@ int main (){
 
     do{
         // Menu
-        printf("\t\tMenu\n");
+        printf("\t\t-----------------Menu----------------\n");
         printf("[1] Importar registros de um arquivo\n");
         printf("[2] Cadastrar novo registro\n");
         printf("[3] Editar registro\n");
@@ -272,13 +398,10 @@ int main (){
 
                 fclose(arq_dados);
 
-                printf("Total de pessoas: %d \n", total);
+                printf("\nTotal de pessoas: %d \n\n\n", total);
                 
                 for(int i = 0; i < total; i++) {
-                    printf("\nnome: %s\n", pessoas[i].nome_completo);
-                    printf("cidade: %s\n", pessoas[i].cidade);
-                    printf("UF: %s\n", pessoas[i].uf);
-                    printf("grupo: %d\n", pessoas[i].grupo);
+                    imprime_info(pessoas, i);
                 }
                 
                 printf("Registros importados com sucesso. \n");
@@ -343,11 +466,35 @@ int main (){
             case 5:
                 printf("BUSCA DE REGISTRO. \n");
 
-                printf("Escolha por qual informacao deseja buscar o registro:\n");
-                printf("[1] - Por nome ou parte do nome\n");
-                printf("[2] - Por data de nascimento\n");
-                printf("[3] - Pelo grupo\n");
-                // ...
+                int busca;
+
+                do {
+                    printf("--------------------------------------------------------\n");
+                    printf("[1] - Por nome ou parte do nome\n");
+                    printf("[2] - Por data de nascimento\n");
+                    printf("[3] - Pelo grupo\n");
+                    printf("[0] - Parar de buscar\n");
+                    printf("Escolha por qual informacao deseja buscar o registro: ");
+                    scanf("%d", &busca);
+
+                    switch(busca) {
+                        case 1:
+                            busca_por_nome(pessoas, total);
+                            break;
+                        case 2:
+                            busca_por_nascimento(pessoas, total);
+                            break;
+                        case 3:
+                            busca_por_grupo(pessoas, total);
+                            break;
+                        case 0:
+                            printf("Saindo da busca de registro. \n");
+                            break;
+                        default:
+                            printf("Opcao invalida. \n");
+                            break;
+                    }
+                } while(busca != 0);
 
                 break;
             case 6:
