@@ -182,7 +182,7 @@ int edita_registro(dados *pessoas, char nome[], int total) {
                     printf("\tXbox: ");
                     scanf("%f", &pessoas[indice].videogames.xbox);
                     printf("\tPC: ");
-                    scanf("%f", pessoas[indice].videogames.pc);
+                    scanf("%f", &pessoas[indice].videogames.pc);
                     break;
                 case 0:
                     printf("Parando de editar os campos de %s. \n", pessoas[indice].nome_completo);
@@ -358,6 +358,93 @@ void busca_por_grupo(dados *pessoas, int total) {
     }
 }
 
+int ordena_registro(dados *pessoas, int total) {
+    int campo = 0;
+    int i, j;
+    int encontrado = 0;
+    int saida;
+
+    //aux
+    dados aux;
+
+        // Menu de campos a serem editados:
+        do {
+            printf("\t[1] - Nome \n");
+            printf("\t[2] - Data de nascimento\n");
+            printf("\t[3] - Cidade\n");
+            printf("\tEscolha a forma como deseja ordenar, ou digite 0 para nao ordenar: ");
+            scanf("%d", &campo);
+            printf("\n");
+
+            // menor pro maior
+
+            switch(campo) {
+                case 1:
+                    //Nome
+                    for (i = 0; i < (total - 1); i++){
+                        for(j = 0; j < total; j++){
+                            saida = strcmp(&pessoas->nome_completo[i],&pessoas->nome_completo[j]);
+                            
+                            if (saida == -1){
+                                aux = pessoas[i];
+                                pessoas[i] = pessoas[j];
+                                pessoas[j] = aux;
+                            }
+                        }
+                    }
+                    break;
+                case 2:
+                    // ano
+                    for (i = 0; i < (total - 1); i++){
+                        for(j = 0; j < total; j++){
+                            
+                            if (pessoas[i].nascimento.ano < pessoas[j].nascimento.ano){
+                                aux = pessoas[i];
+                                pessoas[i] = pessoas[j];
+                                pessoas[j] = aux;
+                            }else if (pessoas[i].nascimento.ano == pessoas[j].nascimento.ano){
+                                if (pessoas[i].nascimento.mes < pessoas[j].nascimento.mes){
+                                    aux = pessoas[i];
+                                    pessoas[i] = pessoas[j];
+                                    pessoas[j] = aux;
+                                }else if (pessoas[i].nascimento.mes == pessoas[j].nascimento.mes){
+                                    if (pessoas[i].nascimento.mes < pessoas[j].nascimento.mes){
+                                        aux = pessoas[i];
+                                        pessoas[i] = pessoas[j];
+                                        pessoas[j] = aux;
+                                    } 
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case 3:
+                    //cidade
+                    for (i = 0; i < (total - 1); i++){
+                        for(j = 0; j < total; j++){
+                            saida = strcmp(&pessoas->cidade[i],&pessoas->cidade[j]);
+                            
+                            if (saida == -1){
+                                aux = pessoas[i];
+                                pessoas[i] = pessoas[j];
+                                pessoas[j] = aux;
+                            }
+                        }
+                    }
+                    break;
+                case 0:
+                    printf("\tSaindo da ordenacao");
+                    break;
+                default:
+                    printf("\tCampo invalido, por favor digite uma das opcoes do menu: \n");
+                    break;
+            }
+        } while(campo != 0);
+    
+
+    return encontrado;
+}
+
 int main (){
     int opt;
     int total = 0;
@@ -498,7 +585,17 @@ int main (){
 
                 break;
             case 6:
-                printf("f");
+                printf("ORDENACAO DE REGISTRO. \n");
+                int ordenar;
+
+                ordenar = ordena_registro(pessoas, total);
+
+                if(ordenar){
+                    printf("Ordenacao realizada com sucesso. \n");
+                }
+                else {
+                    printf("Falha na ordenacao. \n");
+                }
                 break;
             case 7:
                 printf("AGRUPAMENTO DE REGISTROS. \n");
