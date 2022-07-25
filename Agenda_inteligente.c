@@ -101,6 +101,7 @@ dados *exclui_registro(dados *pessoas, int total) {
     dados *novo_pessoas;
     char nome[100];
     int j = 0;
+    int excluido = 0;
 
     novo_pessoas = aloca_pessoas(total-1);
     if(novo_pessoas == NULL) {
@@ -108,7 +109,7 @@ dados *exclui_registro(dados *pessoas, int total) {
         return NULL;
     }
 
-    printf("Digite o nome da pessoas que deseja excluir: ");
+    printf("Digite o nome da pessoa que deseja excluir: ");
     scanf(" %[^\n]%*c", nome);
 
     for(int i = 0; i < total; i++) {
@@ -116,6 +117,18 @@ dados *exclui_registro(dados *pessoas, int total) {
             novo_pessoas[j] = pessoas[i];
             j++;
         }
+        else {
+            // Identifica se o registro foi excluido: 
+            excluido = 1;
+        }
+    }
+
+    // Informa se o registro foi excluido:
+    if(excluido == 1) {
+        printf("Cadastro excluido com sucesso. \n");
+    }
+    else {
+        printf("Nao foi possivel excluir esse registro. \n");
     }
 
     return novo_pessoas;
@@ -168,7 +181,7 @@ int edita_registro(dados *pessoas, char nome[], int total) {
                     scanf("%d", &pessoas[indice].nascimento.ano);
                     break;
                 case 3:
-                    printf("Insira o nova Cidade: ");
+                    printf("Insira a nova Cidade: ");
                     scanf(" %[^\n]%*c", pessoas[indice].cidade);
                     break;
                 case 4:
@@ -361,88 +374,89 @@ void busca_por_grupo(dados *pessoas, int total) {
 int ordena_registro(dados *pessoas, int total) {
     int campo = 0;
     int i, j;
-    int encontrado = 0;
-    int saida;
 
-    //aux
-    dados aux;
+    // Menu de campos a serem editados:
+    printf("-----------------------------------------------------------------\n");
+    printf("[1] - Nome \n");
+    printf("[2] - Data de nascimento\n");
+    printf("[3] - Cidade\n");
+    printf("Escolha a forma como deseja ordenar, ou digite 0 para nao ordenar: ");
+    scanf("%d", &campo);
 
-        // Menu de campos a serem editados:
-        do {
-            printf("\t[1] - Nome \n");
-            printf("\t[2] - Data de nascimento\n");
-            printf("\t[3] - Cidade\n");
-            printf("\tEscolha a forma como deseja ordenar, ou digite 0 para nao ordenar: ");
-            scanf("%d", &campo);
-            printf("\n");
-
-            // menor pro maior
-
-            switch(campo) {
-                case 1:
-                    //Nome
-                    for (i = 0; i < (total - 1); i++){
-                        for(j = 0; j < total; j++){
-                            saida = strcmp(&pessoas->nome_completo[i],&pessoas->nome_completo[j]);
-                            
-                            if (saida == -1){
-                                aux = pessoas[i];
-                                pessoas[i] = pessoas[j];
-                                pessoas[j] = aux;
-                            }
-                        }
+    switch(campo) {
+        case 1:
+            // Por nome:
+            // Bubblesort:
+            for (i = 0; i < total; i++){
+                for(j = 0; j < (total - i - 1); j++){
+                    if(strcmp(pessoas[j].nome_completo, pessoas[j+1].nome_completo) > 0) {
+                        dados aux = pessoas[j];
+                        pessoas[j] = pessoas[j+1];
+                        pessoas[j+1] = aux;
                     }
-                    break;
-                case 2:
-                    // ano
-                    for (i = 0; i < (total - 1); i++){
-                        for(j = 0; j < total; j++){
-                            
-                            if (pessoas[i].nascimento.ano < pessoas[j].nascimento.ano){
-                                aux = pessoas[i];
-                                pessoas[i] = pessoas[j];
-                                pessoas[j] = aux;
-                            }else if (pessoas[i].nascimento.ano == pessoas[j].nascimento.ano){
-                                if (pessoas[i].nascimento.mes < pessoas[j].nascimento.mes){
-                                    aux = pessoas[i];
-                                    pessoas[i] = pessoas[j];
-                                    pessoas[j] = aux;
-                                }else if (pessoas[i].nascimento.mes == pessoas[j].nascimento.mes){
-                                    if (pessoas[i].nascimento.mes < pessoas[j].nascimento.mes){
-                                        aux = pessoas[i];
-                                        pessoas[i] = pessoas[j];
-                                        pessoas[j] = aux;
-                                    } 
-                                }
-                            }
-                        }
-                    }
-                    break;
-                case 3:
-                    //cidade
-                    for (i = 0; i < (total - 1); i++){
-                        for(j = 0; j < total; j++){
-                            saida = strcmp(&pessoas->cidade[i],&pessoas->cidade[j]);
-                            
-                            if (saida == -1){
-                                aux = pessoas[i];
-                                pessoas[i] = pessoas[j];
-                                pessoas[j] = aux;
-                            }
-                        }
-                    }
-                    break;
-                case 0:
-                    printf("\tSaindo da ordenacao");
-                    break;
-                default:
-                    printf("\tCampo invalido, por favor digite uma das opcoes do menu: \n");
-                    break;
+                }
             }
-        } while(campo != 0);
-    
 
-    return encontrado;
+            printf("Ordenacao realizada pelo nome com sucesso. \n\n");
+
+            break;
+        case 2:
+            // Por data de nascimento:
+            // Bubblesort (considerando a hierarquia entre ano, mes e dia):
+            for (i = 0; i < total; i++){
+                for(j = 0; j < total - 1; j++){
+                    // Verifica se o ano eh menor:
+                    if (pessoas[i].nascimento.ano < pessoas[j].nascimento.ano){
+                        dados aux = pessoas[i];
+                        pessoas[i] = pessoas[j];
+                        pessoas[j] = aux;
+                    }
+                    // Se os anos sao iguais, verifica se o mes eh menor:
+                    else if (pessoas[i].nascimento.ano == pessoas[j].nascimento.ano){
+                        if (pessoas[i].nascimento.mes < pessoas[j].nascimento.mes){
+                            dados aux = pessoas[i];
+                            pessoas[i] = pessoas[j];
+                            pessoas[j] = aux;
+                        }
+                        // Se os meses sao iguais, verifica se o dia eh menor:
+                        else if (pessoas[i].nascimento.mes == pessoas[j].nascimento.mes){
+                            if (pessoas[i].nascimento.mes < pessoas[j].nascimento.mes){
+                                dados aux = pessoas[i];
+                                pessoas[i] = pessoas[j];
+                                pessoas[j] = aux;
+                            } 
+                        }
+                    }
+                }
+            }
+
+            printf("\tOrdenacao realizada pela data de nascimento com sucesso. \n");
+
+            break;
+        case 3:
+            // Por cidade:
+            // Bubblesort:
+            for (i = 0; i < total; i++){
+                for(j = 0; j < (total - i - 1); j++){
+                    if(strcmp(pessoas[j].cidade, pessoas[j+1].cidade) > 0) {
+                        dados aux = pessoas[j];
+                        pessoas[j] = pessoas[j+1];
+                        pessoas[j+1] = aux;
+                    }
+                }
+            }
+
+            printf("\tOrdenacao realizada pela cidade com sucesso. \n\n");
+
+            break;
+        case 0:
+            printf("\tSaindo da ordenacao. \n");
+            break;
+        default:
+            printf("\tCampo invalido, por favor digite uma das opcoes do menu: \n");
+            break;
+    }
+
 }
 
 int main (){
@@ -472,7 +486,6 @@ int main (){
                 printf("IMPORTACAO DE REGISTROS \n\n");
                 printf("Digite o nome do arquivo do qual deseja importar os registros: \n");
                 //Recendo nome de arquivo e lendo arquivo
-                // fgets(nome_arquivo, 50, stdin);
                 scanf("%s", nome_arquivo);
 
                 arq_dados = fopen(nome_arquivo, "rb");
@@ -486,8 +499,10 @@ int main (){
                 fclose(arq_dados);
 
                 printf("\nTotal de pessoas: %d \n\n\n", total);
+                printf("Registros importados: \n\n");
                 
                 for(int i = 0; i < total; i++) {
+                    printf("---#---\n");
                     imprime_info(pessoas, i);
                 }
                 
@@ -547,8 +562,6 @@ int main (){
 
                 total--;
 
-                printf("Cadastro excluido com sucesso. \n");
-
                 break;
             case 5:
                 printf("BUSCA DE REGISTRO. \n");
@@ -586,16 +599,9 @@ int main (){
                 break;
             case 6:
                 printf("ORDENACAO DE REGISTRO. \n");
-                int ordenar;
 
-                ordenar = ordena_registro(pessoas, total);
+                ordena_registro(pessoas, total);
 
-                if(ordenar){
-                    printf("Ordenacao realizada com sucesso. \n");
-                }
-                else {
-                    printf("Falha na ordenacao. \n");
-                }
                 break;
             case 7:
                 printf("AGRUPAMENTO DE REGISTROS. \n");
