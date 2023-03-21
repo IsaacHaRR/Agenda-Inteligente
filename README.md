@@ -1,6 +1,7 @@
 # Inteligent- Schedule
-- Project:
-  - Subject : Introduction of Computer Science 1 - Project 2
   
 # Description
-  - It is a schedule that allows you to insert, edit, delete and search for registered records. Records are stored in secondary memory via files (binary mode). The agenda is intelligent, so it can group the records according to characteristics.
+  - It is a program that you can create schedule that allows you to insert, edit, delete and search for registered records.
+  - The records are stored in secondary memory via files (binary mode). 
+  - The agenda is smart, it groups the records of people who are closest to you according to characteristics that you can choose from, like, playstation, xbox or PC.
+  - For the final, the program printed the registered
